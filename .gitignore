@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.venv/
+.env
+.pytest_cache/
+.coverage
+build/
+dist/
+docker-build.log
+models/*.pth
+*.png
+*.jpg
+*.jpeg
+*.webp

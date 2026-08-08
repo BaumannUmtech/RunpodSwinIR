@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "runpod-swinir"
+version = "0.1.0"
+description = "RunPod serverless worker for SwinIR x2 upscaling"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy==1.26.4",
+  "Pillow==11.3.0",
+  "runpod==1.11.0",
+  "spandrel==0.4.2",
+  "torch==2.7.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

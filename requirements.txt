@@ -1,0 +1,5 @@
+numpy==1.26.4
+Pillow==11.3.0
+runpod==1.11.0
+spandrel==0.4.2
+torch==2.7.1
