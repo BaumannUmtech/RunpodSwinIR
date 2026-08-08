@@ -21,4 +21,4 @@ COPY . /app
 RUN mkdir -p /app/models && \
     python3 /app/scripts/download_model.py
 
-CMD ["python3.10", "-m", "runpod_swinir.worker"]
+CMD ["python3.10", "-u", "/app/handler.py"]
