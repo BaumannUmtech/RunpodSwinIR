@@ -57,12 +57,13 @@ class SwinIRUpscaler:
             raise RuntimeError("Ungültiges Bildformat für die Hochskalierung.")
         image = np.clip(image.astype(np.float32), 0.0, 1.0)
         height, width = image.shape[:2]
+        scale = int(getattr(self.model, "scale", 2))
         tile_size = self._normalize_tile_size()
         padding = self._normalize_padding()
 
         padded = np.pad(image, ((padding, padding), (padding, padding), (0, 0)), mode="reflect")
-        output_canvas = np.zeros((height, width, 3), dtype=np.float32)
-        output_weights = np.zeros((height, width), dtype=np.float32)
+        output_canvas = np.zeros((height * scale, width * scale, 3), dtype=np.float32)
+        output_weights = np.zeros((height * scale, width * scale), dtype=np.float32)
 
         for y in range(0, height, tile_size):
             for x in range(0, width, tile_size):
@@ -73,11 +74,17 @@ class SwinIRUpscaler:
                 crop_w = min(tile_size, max(0, tile_w - 2 * padding))
                 if crop_h <= 0 or crop_w <= 0:
                     continue
-                crop = tile_out[padding:padding + crop_h, padding:padding + crop_w, :]
-                out_h = min(crop_h, height - y)
-                out_w = min(crop_w, width - x)
-                output_canvas[y:y + out_h, x:x + out_w, :] = crop[:out_h, :out_w, :]
-                output_weights[y:y + out_h, x:x + out_w] = 1.0
+                crop = tile_out[
+                    padding * scale:(padding + crop_h) * scale,
+                    padding * scale:(padding + crop_w) * scale,
+                    :,
+                ]
+                out_h = min(crop_h, height - y) * scale
+                out_w = min(crop_w, width - x) * scale
+                out_y = y * scale
+                out_x = x * scale
+                output_canvas[out_y:out_y + out_h, out_x:out_x + out_w, :] = crop[:out_h, :out_w, :]
+                output_weights[out_y:out_y + out_h, out_x:out_x + out_w] = 1.0
 
         if not np.isfinite(output_canvas).all():
             raise RuntimeError("Ungültige Modellausgabe mit NaN/Inf-Werten.")
