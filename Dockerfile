@@ -32,9 +32,7 @@ RUN git clone --filter=blob:none https://github.com/sczhou/CodeFormer.git /opt/C
            -e '/from \.train import/d' \
            /opt/CodeFormer/basicsr/__init__.py && \
     sed -i "s/^arch_filenames = .*/arch_filenames = ['vqgan_arch', 'codeformer_arch']/" \
-           /opt/CodeFormer/basicsr/archs/__init__.py && \
-    sed -i 's/torchvision.transforms.functional_tensor/torchvision.transforms.functional/' \
-           /opt/CodeFormer/basicsr/data/degradations.py
+           /opt/CodeFormer/basicsr/archs/__init__.py
 RUN mkdir -p /opt/CodeFormer/weights/CodeFormer /opt/CodeFormer/weights/facelib && \
     curl --fail --location --retry 5 --retry-all-errors \
         --output /opt/CodeFormer/weights/CodeFormer/codeformer.pth \
