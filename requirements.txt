@@ -1,17 +1,7 @@
 numpy==1.26.4
-addict==2.4.0
-future==1.0.0
-lmdb==1.7.3
-lpips==0.1.4
 opencv-python-headless==4.11.0.86
 Pillow==11.3.0
-PyYAML==6.0.2
-requests==2.32.4
 runpod==1.11.0
-scikit-image==0.25.2
-scipy==1.15.3
 spandrel==0.4.2
 torch==2.7.1
 torchvision==0.22.1
-tqdm==4.67.1
-yapf==0.43.0
