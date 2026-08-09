@@ -1,6 +1,7 @@
 numpy==1.26.4
 opencv-python-headless==4.11.0.86
 Pillow==11.3.0
+PyYAML==6.0.2
 requests>=2.34.2
 runpod==1.11.0
 spandrel==0.4.2
