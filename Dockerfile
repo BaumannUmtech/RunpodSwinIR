@@ -42,7 +42,9 @@ RUN mkdir -p /opt/CodeFormer/weights/CodeFormer /opt/CodeFormer/weights/facelib 
         --output /opt/CodeFormer/weights/facelib/parsing_parsenet.pth \
         https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/parsing_parsenet.pth
 RUN cd /opt/CodeFormer && \
-    PYTHONPATH=/opt/CodeFormer python3.10 -c "from basicsr.archs import codeformer_arch; from facelib.utils.face_restoration_helper import FaceRestoreHelper; print('CodeFormer imports OK')" && \
+    PYTHONPATH=/opt/CodeFormer python3.10 -c "from basicsr.archs import codeformer_arch; print('CodeFormer architecture import OK')"
+RUN cd /opt/CodeFormer && \
+    PYTHONPATH=/opt/CodeFormer python3.10 -c "from facelib.utils.face_restoration_helper import FaceRestoreHelper; print('CodeFormer face helper import OK')" && \
     rm -rf /opt/CodeFormer/.git
 
 COPY . /app
