@@ -12,10 +12,12 @@ dependencies = [
   "numpy==1.26.4",
   "opencv-python-headless==4.11.0.86",
   "Pillow==11.3.0",
+  "requests==2.32.4",
   "runpod==1.11.0",
   "spandrel==0.4.2",
   "torch==2.7.1",
   "torchvision==0.22.1",
+  "tqdm==4.67.1",
 ]
 
 [tool.pytest.ini_options]
