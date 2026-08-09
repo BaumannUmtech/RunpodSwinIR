@@ -5,6 +5,9 @@ ENV DEBIAN_FRONTEND=noninteractive \
     SWINIR_MODEL_PATH=/app/models/002_lightweightSR_DIV2K_s64w8_SwinIR-S_x2.pth \
     SWINIR_TILE_SIZE=256 \
     SWINIR_TILE_PADDING=16 \
+    CODEFORMER_ROOT=/opt/CodeFormer \
+    CODEFORMER_MODEL_PATH=/opt/CodeFormer/weights/CodeFormer/codeformer.pth \
+    CODEFORMER_FIDELITY=0.7 \
     MAX_INPUT_BYTES=15728640 \
     LOG_LEVEL=INFO
 
@@ -16,6 +19,15 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN python3.10 -m pip install --no-cache-dir --upgrade pip && \
     python3.10 -m pip install --no-cache-dir -r /app/requirements.txt
+
+ARG CODEFORMER_COMMIT=b33cc7d639d6545bfcccc7e0bc6ae51f24e79c2b
+RUN git clone --filter=blob:none https://github.com/sczhou/CodeFormer.git /opt/CodeFormer && \
+    cd /opt/CodeFormer && \
+    git checkout "$CODEFORMER_COMMIT" && \
+    python3.10 scripts/download_pretrained_models.py CodeFormer && \
+    python3.10 scripts/download_pretrained_models.py facelib && \
+    PYTHONPATH=/opt/CodeFormer python3.10 -c "from basicsr.archs import codeformer_arch; from facelib.utils.face_restoration_helper import FaceRestoreHelper; print('CodeFormer imports OK')" && \
+    rm -rf /opt/CodeFormer/.git
 
 COPY . /app
 RUN mkdir -p /app/models && \

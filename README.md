@@ -8,6 +8,7 @@ Dieser Ordner enthält einen eigenständigen RunPod-Serverless-Worker für SwinI
 - Dekodierung von JPEG/PNG/WebP mit EXIF-Ausrichtung und Alpha-Komposition
 - Zuschneiden auf 16:9, 9:16 oder 1:1
 - GPU-gestützte Hochskalierung mit SwinIR x2
+- Optionale Gesichtserkennung und -restaurierung mit CodeFormer
 - Rückgabe eines Full-HD-JPEG im Vertrag
 
 ## Lokale Nutzung
@@ -30,7 +31,13 @@ img = Image.new('RGB', (64, 64), (40, 80, 120))
 buf = io.BytesIO()
 img.save(buf, format='PNG')
 payload = base64.b64encode(buf.getvalue()).decode('ascii')
-print(handler({'input': {'image_base64': payload, 'aspect_ratio': '16:9', 'output_format': 'jpeg', 'quality': 95}}))
+print(handler({'input': {
+    'image_base64': payload,
+    'aspect_ratio': '16:9',
+    'output_format': 'jpeg',
+    'quality': 95,
+    'face_enhance': True,
+}}))
 PY
 ```
 
@@ -40,7 +47,10 @@ PY
 docker build -t runpod-swinir:local .
 ```
 
-Das Image lädt das offizielle SwinIR-Modell während des Builds herunter und verifiziert die SHA-256-Prüfsumme.
+Das Image lädt das offizielle SwinIR-Modell sowie den fest gepinnten offiziellen
+CodeFormer-Quellstand und dessen Gewichte während des Builds. `face_enhance`
+ist optional und standardmäßig `false`; ohne erkannte Gesichter bleibt das
+SwinIR-Ergebnis unverändert.
 
 ## Git-basierter Docker-Push
 

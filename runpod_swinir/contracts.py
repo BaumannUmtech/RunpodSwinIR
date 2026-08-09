@@ -23,6 +23,7 @@ class RequestValidation:
     aspect_ratio: str
     quality: int
     output_format: str
+    face_enhance: bool
 
 
 class ValidationError(Exception):
@@ -62,11 +63,16 @@ def validate_request(event: dict[str, Any]) -> RequestValidation:
     if not isinstance(quality, int) or not (80 <= quality <= 100):
         raise ValidationError("INVALID_REQUEST", "quality muss zwischen 80 und 100 liegen.")
 
+    face_enhance = payload.get("face_enhance", False)
+    if not isinstance(face_enhance, bool):
+        raise ValidationError("INVALID_REQUEST", "face_enhance muss true oder false sein.")
+
     return RequestValidation(
         image_bytes=image_bytes,
         aspect_ratio=aspect_ratio,
         quality=quality,
         output_format=output_format,
+        face_enhance=face_enhance,
     )
 
 

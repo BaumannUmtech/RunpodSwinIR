@@ -18,6 +18,7 @@ logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
 logger = logging.getLogger("runpod_swinir")
 
 _UPSCALER: SwinIRUpscaler | None = None
+_FACE_ENHANCER = None
 
 
 def _get_upscaler() -> SwinIRUpscaler:
@@ -25,6 +26,15 @@ def _get_upscaler() -> SwinIRUpscaler:
     if _UPSCALER is None:
         _UPSCALER = SwinIRUpscaler()
     return _UPSCALER
+
+
+def _get_face_enhancer():
+    global _FACE_ENHANCER
+    if _FACE_ENHANCER is None:
+        from .face_enhancer import CodeFormerFaceEnhancer
+
+        _FACE_ENHANCER = CodeFormerFaceEnhancer()
+    return _FACE_ENHANCER
 
 
 def _build_error(error_code: str, message: str) -> dict[str, Any]:
@@ -53,7 +63,11 @@ def handler(event: dict[str, Any]) -> dict[str, Any]:
         if not np.isfinite(output).all():
             raise RuntimeError("Ungültige Modellausgabe")
 
-        result_image = Image.fromarray(np.uint8(np.clip(output * 255.0, 0.0, 255.0)))
+        result_array = np.uint8(np.clip(output * 255.0, 0.0, 255.0))
+        faces_restored = 0
+        if request.face_enhance:
+            result_array, faces_restored = _get_face_enhancer().enhance(result_array)
+        result_image = Image.fromarray(result_array)
         jpeg_bytes = encode_jpeg(result_image, request.quality)
         payload = base64.b64encode(jpeg_bytes).decode("ascii")
         return {
@@ -62,8 +76,10 @@ def handler(event: dict[str, Any]) -> dict[str, Any]:
             "mime_type": "image/jpeg",
             "width": target_width,
             "height": target_height,
-            "upscaler": "swinir",
+            "upscaler": "swinir_codeformer" if request.face_enhance else "swinir",
             "model": "002_lightweightSR_DIV2K_s64w8_SwinIR-S_x2",
+            "face_enhance": request.face_enhance,
+            "faces_restored": faces_restored,
             "processing_ms": int((time.time() - start) * 1000),
         }
     except ValidationError as exc:
