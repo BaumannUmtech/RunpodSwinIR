@@ -53,3 +53,31 @@ def test_handler_runs_codeformer_when_requested(monkeypatch):
     assert result["success"] is True
     assert result["upscaler"] == "swinir_codeformer"
     assert result["faces_restored"] == 2
+
+
+def test_handler_returns_lossless_png(monkeypatch):
+    image = Image.new("RGB", (64, 64), (10, 20, 30))
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    payload = base64.b64encode(buffer.getvalue()).decode("ascii")
+
+    class DummyUpscaler:
+        def upscale(self, image, target_size):
+            return image
+
+    monkeypatch.setattr("runpod_swinir.worker._get_upscaler", lambda: DummyUpscaler())
+    result = handler(
+        {
+            "input": {
+                "image_base64": payload,
+                "aspect_ratio": "16:9",
+                "output_format": "png",
+            }
+        }
+    )
+
+    assert result["success"] is True
+    assert result["mime_type"] == "image/png"
+    with Image.open(io.BytesIO(base64.b64decode(result["image_base64"]))) as output:
+        assert output.format == "PNG"
+        assert output.size == (1920, 1080)

@@ -11,7 +11,13 @@ import runpod
 from PIL import Image
 
 from .contracts import TARGET_DIMENSIONS, ValidationError, decode_image, validate_request
-from .image_utils import center_crop_to_aspect, composite_alpha_to_white, encode_jpeg, pil_to_numpy
+from .image_utils import (
+    center_crop_to_aspect,
+    composite_alpha_to_white,
+    encode_jpeg,
+    encode_png,
+    pil_to_numpy,
+)
 from .upscaler import SwinIRUpscaler
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
@@ -68,12 +74,17 @@ def handler(event: dict[str, Any]) -> dict[str, Any]:
         if request.face_enhance:
             result_array, faces_restored = _get_face_enhancer().enhance(result_array)
         result_image = Image.fromarray(result_array)
-        jpeg_bytes = encode_jpeg(result_image, request.quality)
-        payload = base64.b64encode(jpeg_bytes).decode("ascii")
+        if request.output_format == "png":
+            output_bytes = encode_png(result_image)
+            mime_type = "image/png"
+        else:
+            output_bytes = encode_jpeg(result_image, request.quality)
+            mime_type = "image/jpeg"
+        payload = base64.b64encode(output_bytes).decode("ascii")
         return {
             "success": True,
             "image_base64": payload,
-            "mime_type": "image/jpeg",
+            "mime_type": mime_type,
             "width": target_width,
             "height": target_height,
             "upscaler": "swinir_codeformer" if request.face_enhance else "swinir",

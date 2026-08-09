@@ -44,6 +44,8 @@ RUN cd /opt/CodeFormer && \
     rm -rf /opt/CodeFormer/.git
 
 COPY . /app
+RUN python3.10 -m compileall -q /app/runpod_swinir && \
+    python3.10 -c "import io; from PIL import Image; from runpod_swinir.image_utils import encode_png; data = encode_png(Image.new('RGB', (2, 2))); assert Image.open(io.BytesIO(data)).format == 'PNG'; print('PNG output check OK')"
 RUN mkdir -p /app/models && \
     python3 /app/scripts/download_model.py
 

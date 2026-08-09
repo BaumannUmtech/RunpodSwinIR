@@ -60,3 +60,9 @@ def encode_jpeg(image: Image.Image, quality: int) -> bytes:
     buffer = io.BytesIO()
     image.save(buffer, format="JPEG", quality=quality, subsampling=2)
     return buffer.getvalue()
+
+
+def encode_png(image: Image.Image) -> bytes:
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG", optimize=True)
+    return buffer.getvalue()

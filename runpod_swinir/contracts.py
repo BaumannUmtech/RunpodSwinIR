@@ -55,9 +55,9 @@ def validate_request(event: dict[str, Any]) -> RequestValidation:
     if aspect_ratio not in VALID_ASPECT_RATIOS:
         raise ValidationError("UNSUPPORTED_ASPECT_RATIO", "Das Seitenverhältnis wird nicht unterstützt.")
 
-    output_format = payload.get("output_format", "jpeg")
-    if output_format != "jpeg":
-        raise ValidationError("INVALID_REQUEST", "Nur JPEG-Ausgaben sind in Stufe 1 unterstützt.")
+    output_format = str(payload.get("output_format", "jpeg") or "").lower()
+    if output_format not in {"jpeg", "png"}:
+        raise ValidationError("INVALID_REQUEST", "output_format muss jpeg oder png sein.")
 
     quality = payload.get("quality", 95)
     if not isinstance(quality, int) or not (80 <= quality <= 100):

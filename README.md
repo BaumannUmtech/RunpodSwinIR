@@ -9,7 +9,7 @@ Dieser Ordner enthält einen eigenständigen RunPod-Serverless-Worker für SwinI
 - Zuschneiden auf 16:9, 9:16 oder 1:1
 - GPU-gestützte Hochskalierung mit SwinIR x2
 - Optionale Gesichtserkennung und -restaurierung mit CodeFormer
-- Rückgabe eines Full-HD-JPEG im Vertrag
+- Rückgabe eines Full-HD-PNG (verlustfrei) oder JPEG im Vertrag
 
 ## Lokale Nutzung
 
@@ -34,7 +34,7 @@ payload = base64.b64encode(buf.getvalue()).decode('ascii')
 print(handler({'input': {
     'image_base64': payload,
     'aspect_ratio': '16:9',
-    'output_format': 'jpeg',
+    'output_format': 'png',
     'quality': 95,
     'face_enhance': True,
 }}))

@@ -30,6 +30,17 @@ def test_validate_request_accepts_face_enhance():
     assert request.face_enhance is True
 
 
+def test_validate_request_accepts_png_output():
+    image = Image.new("RGB", (4, 4))
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    payload = base64.b64encode(buffer.getvalue()).decode("ascii")
+    request = validate_request(
+        {"input": {"image_base64": payload, "output_format": "png"}}
+    )
+    assert request.output_format == "png"
+
+
 def test_validate_request_rejects_non_boolean_face_enhance():
     payload = base64.b64encode(b"image").decode("ascii")
     with pytest.raises(ValidationError) as exc:
