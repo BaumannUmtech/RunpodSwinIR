@@ -24,13 +24,7 @@ ARG CODEFORMER_COMMIT=b33cc7d639d6545bfcccc7e0bc6ae51f24e79c2b
 RUN git clone --filter=blob:none https://github.com/sczhou/CodeFormer.git /opt/CodeFormer && \
     cd /opt/CodeFormer && \
     git checkout "$CODEFORMER_COMMIT" && \
-    sed -i -e '/from \.data import/d' \
-           -e '/from \.losses import/d' \
-           -e '/from \.metrics import/d' \
-           -e '/from \.models import/d' \
-           -e '/from \.ops import/d' \
-           -e '/from \.train import/d' \
-           /opt/CodeFormer/basicsr/__init__.py && \
+    sed -i '/^from \./d' /opt/CodeFormer/basicsr/__init__.py && \
     sed -i "s/^arch_filenames = .*/arch_filenames = ['vqgan_arch', 'codeformer_arch']/" \
            /opt/CodeFormer/basicsr/archs/__init__.py
 RUN mkdir -p /opt/CodeFormer/weights/CodeFormer /opt/CodeFormer/weights/facelib && \
