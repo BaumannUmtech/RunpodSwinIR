@@ -23,9 +23,11 @@ RUN python3.10 -m pip install --no-cache-dir --upgrade pip && \
 ARG CODEFORMER_COMMIT=b33cc7d639d6545bfcccc7e0bc6ae51f24e79c2b
 RUN git clone --filter=blob:none https://github.com/sczhou/CodeFormer.git /opt/CodeFormer && \
     cd /opt/CodeFormer && \
-    git checkout "$CODEFORMER_COMMIT" && \
+    git checkout "$CODEFORMER_COMMIT"
+RUN cd /opt/CodeFormer && \
     python3.10 scripts/download_pretrained_models.py CodeFormer && \
-    python3.10 scripts/download_pretrained_models.py facelib && \
+    python3.10 scripts/download_pretrained_models.py facelib
+RUN cd /opt/CodeFormer && \
     PYTHONPATH=/opt/CodeFormer python3.10 -c "from basicsr.archs import codeformer_arch; from facelib.utils.face_restoration_helper import FaceRestoreHelper; print('CodeFormer imports OK')" && \
     rm -rf /opt/CodeFormer/.git
 
